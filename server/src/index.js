@@ -6,7 +6,7 @@ import path from 'path';
 import cors from 'cors';
 import { exec } from 'child_process';
 import { EQUIP_TYPES, AFFIX_POOL, AFFIX_TIERS, RARITY_MAP, SKILL_LIST, SKILL_RUNES, TOWER_CONFIG, EXPLORATION_TIERS, CLASSES } from './data.js';
-import { registerRoute, loginRoute, authMiddleware } from './auth.js';
+import { registerRoute, loginRoute, authMiddleware, getUserCount } from './auth.js';
 import gameStateManager from './gameStateManager.js';
 
 const app = express();
@@ -164,6 +164,42 @@ app.post('/api/webhook/deploy', (req, res) => {
     console.log(log);
     require('fs').appendFileSync('/home/admin/idle-rpg/deploy.log', log + '\n---\n');
   });
+});
+
+// ============================================================
+// Admin Dashboard (public — shows basic stats)
+// ============================================================
+app.get('/admin', (req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>仪表盘 — Idle Chronicles</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d0f14;color:#e8eaf0;font-family:system-ui,-apple-system,sans-serif;display:flex;justify-content:center;padding:40px 16px}
+.card{background:#13161f;border:1px solid #1e2230;border-radius:12px;padding:32px;max-width:480px;width:100%}
+h1{font-size:20px;margin-bottom:8px}
+.sub{color:#6b7290;font-size:13px;margin-bottom:28px}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #1e2230}
+.stat-label{font-size:15px}
+.stat-value{font-size:22px;font-weight:700;color:#4caf50}
+.stat-value.blue{color:#4fc3f7}
+.btn-row{margin-top:24px;display:flex;gap:10px}
+.btn{padding:8px 18px;border-radius:6px;border:none;cursor:pointer;font-size:13px}
+.btn-refresh{background:#4a90d9;color:#fff}
+.btn-game{background:#1e2230;color:#8890a8}
+.meta{font-size:11px;color:#555e78;margin-top:16px}
+</style></head><body>
+<div class="card">
+<h1>⚔ Idle Chronicles</h1>
+<div class="sub">实时仪表盘</div>
+<div class="stat-row"><span class="stat-label">📝 注册用户</span><span class="stat-value blue">${getUserCount()}</span></div>
+<div class="stat-row"><span class="stat-label">🟢 当前在线</span><span class="stat-value">${gameStateManager.getActiveCount()}</span></div>
+<div class="btn-row">
+<button class="btn btn-refresh" onclick="location.reload()">刷新</button>
+<a class="btn btn-game" href="/">进入游戏</a>
+</div>
+<div class="meta">在线=加载到内存的用户（离线5分钟后会释放） | 更新时间: ${new Date().toLocaleString('zh-CN')}</div>
+</div></body></html>`);
 });
 
 // ============================================================

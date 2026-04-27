@@ -14,6 +14,10 @@ function getUsers() {
   return load('users', {});
 }
 
+export function getUserCount() {
+  return Object.keys(getUsers()).length;
+}
+
 function saveUsers(users) {
   save('users', users);
 }
