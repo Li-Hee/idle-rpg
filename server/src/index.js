@@ -4,6 +4,7 @@
 import express from 'express';
 import path from 'path';
 import cors from 'cors';
+import { exec } from 'child_process';
 import { EQUIP_TYPES, AFFIX_POOL, AFFIX_TIERS, RARITY_MAP, SKILL_LIST, SKILL_RUNES, TOWER_CONFIG, EXPLORATION_TIERS, CLASSES } from './data.js';
 import { registerRoute, loginRoute, authMiddleware } from './auth.js';
 import gameStateManager from './gameStateManager.js';
@@ -151,6 +152,18 @@ function respond(res, gameState) {
 // ============================================================
 app.post('/api/auth/register', registerRoute);
 app.post('/api/auth/login', loginRoute);
+
+// ============================================================
+// GitHub Webhook — auto-deploy on push
+// ============================================================
+app.post('/api/webhook/deploy', (req, res) => {
+  res.json({ ok: true, msg: 'deploy triggered' });
+  exec('cd ~/idle-rpg && git pull origin master && cd server && npm install && cd ../client && npm install && npx vite build && pm2 restart idle-chronicles 2>&1', (err, stdout, stderr) => {
+    console.log('[deploy]', new Date().toISOString(), err ? 'FAIL' : 'OK');
+    if (stdout) console.log('[deploy]', stdout);
+    if (stderr) console.error('[deploy]', stderr);
+  });
+});
 
 // ============================================================
 // JWT Middleware — protect all /api/* routes below
