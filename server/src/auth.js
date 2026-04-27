@@ -36,6 +36,16 @@ export function registerRoute(req, res) {
   if (!/^[a-zA-Z0-9_一-鿿]+$/.test(username)) {
     return res.status(400).json({ error: '用户名只能包含字母、数字、下划线和中文' });
   }
+  const reserved = new Set([
+    'admin','administrator','root','system','sys','gm','game','server',
+    'staff','mod','moderator','owner','master','webmaster','host',
+    '管理员','系统','客服','官方','管理','超级管理员','版主',
+    'admin1','admin2','root1','test','guest','anonymous',
+    'idle','chronicles','idlechronicles','idle-chronicles'
+  ]);
+  if (reserved.has(username.toLowerCase())) {
+    return res.status(403).json({ error: '该用户名已被保留，请换一个' });
+  }
   const users = getUsers();
   if (users[username]) {
     return res.status(409).json({ error: '用户名已存在' });
