@@ -158,10 +158,11 @@ app.post('/api/auth/login', loginRoute);
 // ============================================================
 app.post('/api/webhook/deploy', (req, res) => {
   res.json({ ok: true, msg: 'deploy triggered' });
-  exec('cd ~/idle-rpg && git pull origin master && cd server && npm install && cd ../client && npm install && npx vite build && pm2 restart idle-chronicles 2>&1', (err, stdout, stderr) => {
-    console.log('[deploy]', new Date().toISOString(), err ? 'FAIL' : 'OK');
-    if (stdout) console.log('[deploy]', stdout);
-    if (stderr) console.error('[deploy]', stderr);
+  const cmd = 'cd /home/admin/idle-rpg && git pull origin master && cd server && npm install && cd ../client && npm install && npx vite build && pm2 restart idle-chronicles';
+  exec(cmd, (err, stdout, stderr) => {
+    const log = `[deploy ${new Date().toISOString()}] ${err ? 'FAIL' : 'OK'}\n${stdout || ''}\n${stderr || ''}`;
+    console.log(log);
+    require('fs').appendFileSync('/home/admin/idle-rpg/deploy.log', log + '\n---\n');
   });
 });
 
