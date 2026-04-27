@@ -6,7 +6,7 @@ import path from 'path';
 import cors from 'cors';
 import { exec } from 'child_process';
 import { EQUIP_TYPES, AFFIX_POOL, AFFIX_TIERS, RARITY_MAP, SKILL_LIST, SKILL_RUNES, TOWER_CONFIG, EXPLORATION_TIERS, CLASSES } from './data.js';
-import { registerRoute, loginRoute, authMiddleware, getUserCount } from './auth.js';
+import { registerRoute, loginRoute, authMiddleware, getUserCount, getAllUsers } from './auth.js';
 import gameStateManager from './gameStateManager.js';
 
 const app = express();
@@ -170,36 +170,76 @@ app.post('/api/webhook/deploy', (req, res) => {
 // Admin Dashboard (public — shows basic stats)
 // ============================================================
 app.get('/admin', (req, res) => {
+  const allUsers = getAllUsers();
+  const activeUsers = gameStateManager.getDetailedStats();
+  const userCount = Object.keys(allUsers).length;
+  const activeCount = activeUsers.length;
+  const onlineUsernames = new Set(activeUsers.map(u => u.username));
+
+  const activeRows = activeUsers.sort((a,b) => b.power - a.power).map(u =>
+    `<tr>
+      <td>🟢 ${u.username}</td>
+      <td>Lv.${u.level}</td>
+      <td>⚔${u.power}</td>
+      <td>💀${u.kills}</td>
+      <td>💰${u.gold}</td>
+      <td>${u.class || '-'}</td>
+      <td>${u.running ? '⚔️' : '⏸️'}</td>
+    </tr>`
+  ).join('');
+
+  const regRows = Object.entries(allUsers).sort((a,b) => a[1].createdAt - b[1].createdAt).map(([name, data]) =>
+    `<tr>
+      <td>${onlineUsernames.has(name) ? '🟢' : '⚫'} ${name}</td>
+      <td>${new Date(data.createdAt).toLocaleDateString('zh-CN')}</td>
+      <td>${onlineUsernames.has(name) ? '在线' : '离线'}</td>
+    </tr>`
+  ).join('');
+
   res.send(`<!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>仪表盘 — Idle Chronicles</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0d0f14;color:#e8eaf0;font-family:system-ui,-apple-system,sans-serif;display:flex;justify-content:center;padding:40px 16px}
-.card{background:#13161f;border:1px solid #1e2230;border-radius:12px;padding:32px;max-width:480px;width:100%}
-h1{font-size:20px;margin-bottom:8px}
-.sub{color:#6b7290;font-size:13px;margin-bottom:28px}
-.stat-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #1e2230}
-.stat-label{font-size:15px}
-.stat-value{font-size:22px;font-weight:700;color:#4caf50}
-.stat-value.blue{color:#4fc3f7}
-.btn-row{margin-top:24px;display:flex;gap:10px}
+body{background:#0d0f14;color:#e8eaf0;font-family:system-ui,-apple-system,sans-serif;padding:20px 16px}
+h1{font-size:20px;margin-bottom:4px}
+.sub{color:#6b7290;font-size:13px;margin-bottom:20px}
+.cards{display:flex;gap:12px;margin-bottom:24px}
+.minicard{flex:1;background:#13161f;border:1px solid #1e2230;border-radius:10px;padding:16px;text-align:center}
+.minicard .num{font-size:28px;font-weight:700;color:#4caf50}
+.minicard .num.blue{color:#4fc3f7}
+.minicard .lbl{font-size:12px;color:#6b7290;margin-top:4px}
+.section{margin-bottom:24px}
+.section-title{font-size:14px;font-weight:700;margin-bottom:10px;color:#8890a8}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 10px;color:#6b7290;font-weight:500;font-size:11px;border-bottom:1px solid #1e2230}
+td{padding:8px 10px;border-bottom:1px solid #1e2230;white-space:nowrap}
+.btn-row{margin-top:20px;display:flex;gap:10px}
 .btn{padding:8px 18px;border-radius:6px;border:none;cursor:pointer;font-size:13px}
 .btn-refresh{background:#4a90d9;color:#fff}
 .btn-game{background:#1e2230;color:#8890a8}
 .meta{font-size:11px;color:#555e78;margin-top:16px}
 </style></head><body>
-<div class="card">
 <h1>⚔ Idle Chronicles</h1>
-<div class="sub">实时仪表盘</div>
-<div class="stat-row"><span class="stat-label">📝 注册用户</span><span class="stat-value blue">${getUserCount()}</span></div>
-<div class="stat-row"><span class="stat-label">🟢 当前在线</span><span class="stat-value">${gameStateManager.getActiveCount()}</span></div>
-<div class="btn-row">
-<button class="btn btn-refresh" onclick="location.reload()">刷新</button>
-<a class="btn btn-game" href="/">进入游戏</a>
+<div class="sub">服务器实时仪表盘</div>
+<div class="cards">
+  <div class="minicard"><div class="num blue">${userCount}</div><div class="lbl">📝 注册用户</div></div>
+  <div class="minicard"><div class="num">${activeCount}</div><div class="lbl">🟢 当前在线</div></div>
 </div>
-<div class="meta">在线=加载到内存的用户（离线5分钟后会释放） | 更新时间: ${new Date().toLocaleString('zh-CN')}</div>
-</div></body></html>`);
+<div class="section">
+  <div class="section-title">🟢 在线玩家 (${activeCount}人)</div>
+  <table>${activeRows ? '<thead><tr><th>用户名</th><th>等级</th><th>战力</th><th>击杀</th><th>金币</th><th>职业</th><th>状态</th></tr></thead>' : ''}<tbody>${activeRows || '<tr><td style="color:#555e78">暂无在线玩家</td></tr>'}</tbody></table>
+</div>
+<div class="section">
+  <div class="section-title">📋 全部注册用户 (${userCount}人)</div>
+  <table><thead><tr><th>用户名</th><th>注册日期</th><th>状态</th></tr></thead><tbody>${regRows}</tbody></table>
+</div>
+<div class="btn-row">
+  <button class="btn btn-refresh" onclick="location.reload()">🔄 刷新</button>
+  <a class="btn btn-game" href="/">🎮 进入游戏</a>
+</div>
+<div class="meta">更新时间: ${new Date().toLocaleString('zh-CN')}</div>
+</body></html>`);
 });
 
 // ============================================================

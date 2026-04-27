@@ -49,6 +49,26 @@ class GameStateManager {
   getActiveCount() {
     return this.states.size;
   }
+
+  getDetailedStats() {
+    const users = [];
+    for (const [username, gs] of this.states) {
+      const p = gs.player;
+      users.push({
+        username,
+        level: p.level,
+        power: p.power || 0,
+        kills: p.kills || 0,
+        gold: Math.floor(p.gold || 0),
+        rebirth: p.rebirthCount || 0,
+        class: p.classId || '',
+        running: gs.running,
+        hp: `${Math.floor(p.hp || 0)}/${p.maxHp || 0}`,
+        lastSave: p.lastSaveTime || 0
+      });
+    }
+    return users;
+  }
 }
 
 const manager = new GameStateManager();

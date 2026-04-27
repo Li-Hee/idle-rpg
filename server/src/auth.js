@@ -18,6 +18,10 @@ export function getUserCount() {
   return Object.keys(getUsers()).length;
 }
 
+export function getAllUsers() {
+  return getUsers();
+}
+
 function saveUsers(users) {
   save('users', users);
 }
