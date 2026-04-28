@@ -287,11 +287,12 @@ function InventoryPanel({ items, bagSize, onEquip, onSell, onSellAll, onSellRari
           const ss = [];
           if (item.atk > 0) ss.push(`ATK+${item.atk}`);
           if (item.def > 0) ss.push(`DEF+${item.def}`);
+          const slotIcon = { weapon: '⚔', armor: '🛡', helmet: '⛑', boots: '👟', ring: '💍', amulet: '📿' }[item.type] || '';
           return (
             <div key={item.id} className="bag-item">
               <div className="bag-item-info">
                 <div className="bag-item-title" style={{ color: item.color }}>
-                  <span className="bag-item-lv">Lv.{item.itemLv}</span>{item.name}
+                  <span className="bag-item-lv">Lv.{item.itemLv}</span><span style={{marginRight:4}}>{slotIcon}</span>{item.name}
                 </div>
                 <div className="bag-item-stats">{ss.join(' ')}</div>
                 {item.affixes?.length > 0 && (
