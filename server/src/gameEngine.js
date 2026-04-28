@@ -132,7 +132,7 @@ class GameState {
         heal: { auto: true, cd: 0, rune: null },
         vampire: { auto: true, cd: 0, rune: null }
       },
-      currentTier: p.currentTier || 'auto',
+      currentTier: 'auto',
       unlockedTier: p.unlockedTier || 0,
       completedAchievements: p.completedAchievements || {},
       towerHighest: p.towerHighest || 0,
