@@ -587,11 +587,13 @@ app.post('/api/action/rebirth', (req, res) => {
   const p = gameState.player;
   const target = 50 + p.rebirthCount * 25;
   if (p.level < target) return respond(res, gameState);
-  const lostGold = p.gold;
+  const lostGold = Math.floor(p.gold * 0.5);
+  const lostStones = Math.floor(p.stones * 0.5);
   p.rebirthCount++;
-  p.level = 1; p.exp = 0; p.stones = 0;
+  p.level = 1; p.exp = 0;
+  p.stones -= lostStones;
   if (lostGold > 0) gameState.goldLog(-lostGold, 'rebirth', `第${p.rebirthCount}次转生`);
-  p.gold = 0;
+  p.gold -= lostGold;
   p.killStreak = 0; p.lifetimeGold = 0; p.totalKills = 0;
   p.killsSinceBoss = 0;
   p.equipment = { weapon: null, armor: null, helmet: null, boots: null, ring: null, amulet: null };

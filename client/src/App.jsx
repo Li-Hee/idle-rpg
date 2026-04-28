@@ -422,12 +422,12 @@ function RebirthPanel({ player, onRebirth }) {
           <div className="rb-desc">当前永久加成：</div>
           <div className="rb-bonus-grid">
             {[
-              { label: '⚔ 攻击力', id: 'atk', val: player.rebirthCount * 10 },
-              { label: '🛡 防御力', id: 'def', val: player.rebirthCount * 10 },
-              { label: '❤️ 生命值', id: 'hp', val: player.rebirthCount * 10 },
-              { label: '✨ 经验', id: 'exp', val: player.rebirthCount * 5 },
-              { label: '💰 金币', id: 'gold', val: player.rebirthCount * 5 },
-              { label: '🎁 掉率', id: 'drop', val: player.rebirthCount * 3 }
+              { label: '⚔ 攻击力', id: 'atk', val: player.rebirthCount * 25 },
+              { label: '🛡 防御力', id: 'def', val: player.rebirthCount * 25 },
+              { label: '❤️ 生命值', id: 'hp', val: player.rebirthCount * 25 },
+              { label: '✨ 经验', id: 'exp', val: player.rebirthCount * 15 },
+              { label: '💰 金币', id: 'gold', val: player.rebirthCount * 15 },
+              { label: '🎁 掉率', id: 'drop', val: player.rebirthCount * 10 }
             ].map(b => (
               <div key={b.id} className="rb-bonus-item">
                 {b.label}<div className="rb-val">+{b.val}%</div>
@@ -440,6 +440,12 @@ function RebirthPanel({ player, onRebirth }) {
         <div className="stag-warning">
           <div style={{ color: '#e04040', fontWeight: 700, marginBottom: 4 }}>⚠ 尘世羁绊 {stag} 层</div>
           <div>EXP -{stag * 2}% | 金币 -{stag * 2}% | 全属性 -{stag}%</div>
+        </div>
+      )}
+      {unlocked && (
+        <div style={{ fontSize: 11, color: '#4caf50', marginBottom: 8, lineHeight: 1.8 }}>
+          ✅ 保留：金币和强化石的 50%<br />
+          ❌ 重置：等级、装备、背包、修炼
         </div>
       )}
       <button className="btn-rebirth" disabled={!unlocked} onClick={onRebirth}>

@@ -395,7 +395,7 @@ class GameState {
   // ---- Rebirth ----
   getRebirthBonus(type) {
     const count = this.player.rebirthCount;
-    const bonuses = { atk: 0.10, def: 0.10, hp: 0.10, exp: 0.05, gold: 0.05, drop: 0.03 };
+    const bonuses = { atk: 0.25, def: 0.25, hp: 0.25, exp: 0.15, gold: 0.15, drop: 0.10 };
     return 1 + count * (bonuses[type] || 0);
   }
 
