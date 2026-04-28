@@ -834,7 +834,7 @@ class GameState {
       if (next > p.unlockedTier) {
         p.unlockedTier = next;
       }
-      p.currentTier = (next + 1).toString();
+      p.currentTier = 'auto';
       const sel = MONSTER_TABLE[next];
       this.addLog(`🗺️ 已推进至【${sel.name}】！`, 'sys');
       this.addToast(`🗺️ 已推进至【${sel.name}】`, 'success');
