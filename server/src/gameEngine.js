@@ -582,7 +582,7 @@ class GameState {
     const item = this._buildItem(p.level, ti, type, RARITY_MAP[1]); // 优秀 quality
     // Auto-equip if better than current (same logic as drops)
     const ce = p.equipment[item.type];
-    const cs = ce ? Math.floor(ce.score * (1 + 0.15 * (p.enhanceLevels[item.type] || 0))) : 0;
+    const cs = ce ? ce.score : 0;
     if (p.settings.autoEquip && item.score > cs && this.canEquipItem(item)) {
       p.equipment[item.type] = item;
       this.checkSetBonuses();
@@ -787,7 +787,7 @@ class GameState {
       this._checkCollection(item);
       this._updateQuestProgress('collect');
       const ce = p.equipment[item.type];
-      const cs = ce ? Math.floor(ce.score * (1 + 0.15 * (p.enhanceLevels[item.type] || 0))) : 0;
+      const cs = ce ? ce.score : 0;
       const inHtml = `Lv.${item.itemLv} <span style="color:${item.color}">${item.name}</span>`;
       if (p.settings.autoEquip && item.score > cs && this.canEquipItem(item)) {
         p.equipment[item.type] = item;
@@ -1046,7 +1046,7 @@ class GameState {
       const item = this.generateDrop(avgLv, mi);
       if (p.settings.autoEquip && this.canEquipItem(item)) {
         const ce = p.equipment[item.type];
-        const cs = ce ? Math.floor(ce.score * (1 + 0.15 * (p.enhanceLevels[item.type] || 0))) : 0;
+        const cs = ce ? ce.score : 0;
         if (item.score > cs) {
           if (ce) this.addToInventory(ce);
           p.equipment[item.type] = item;
