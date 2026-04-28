@@ -452,17 +452,15 @@ class GameState {
   // ============================================================
   spawnMonster(pl, isBoss) {
     const p = this.player;
-    let tl = p.currentTier === 'auto' ? pl : pl;
-    let tpl = MONSTER_TABLE[0];
-    if (p.currentTier !== 'auto') {
-      tpl = MONSTER_TABLE.find(t => t.id == p.currentTier) || tpl;
-    } else {
-      for (let i = 0; i < MONSTER_TABLE.length; i++) {
-        if (tl >= MONSTER_TABLE[i].minLv) tpl = MONSTER_TABLE[i];
-        else break;
-      }
+    // tier follows max of player level and unlockedTier (boss kills push you forward)
+    let tierIdx = 0;
+    for (let i = 0; i < MONSTER_TABLE.length; i++) {
+      if (pl >= MONSTER_TABLE[i].minLv) tierIdx = i;
+      else break;
     }
-    const lv = Math.max(tpl.minLv, Math.min(tpl.maxLv, tl + Math.floor(Math.random() * 2) - 1));
+    tierIdx = Math.max(tierIdx, p.unlockedTier || 0);
+    const tpl = MONSTER_TABLE[Math.min(tierIdx, MONSTER_TABLE.length - 1)];
+    const lv = Math.max(tpl.minLv, Math.min(tpl.maxLv, pl + Math.floor(Math.random() * 3) - 1));
     const scale = getScale(lv);
     const rewardScale = getRewardScale(lv);
     const bm = isBoss ? 4 : 1;
