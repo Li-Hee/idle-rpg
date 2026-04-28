@@ -206,8 +206,8 @@ export const PASSIVE_SKILLS = [
 // armorTier: [minTierIndex, maxTierIndex] for armor/helmet/boots (weapon/ring/amulet unrestricted)
 export const EQUIP_RESTRICTIONS = {
   warrior:  { label: '无限制', armorTier: [0, 9] },
-  paladin:  { label: '仅限重甲', armorTier: [3, 9] },
-  assassin: { label: '仅限轻甲', armorTier: [0, 2] },
+  paladin:  { label: '无限制', armorTier: [0, 9] },
+  assassin: { label: '无限制', armorTier: [0, 9] },
 };
 
 // ---- 装备进阶合成配方 ----
