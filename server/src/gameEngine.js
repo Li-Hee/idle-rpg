@@ -491,7 +491,9 @@ class GameState {
   generateDrop(ml, ti, minR) {
     // Cap drop level to player level to prevent gear snowball from high-tier maps
     const effectiveMl = Math.min(ml, this.player.level);
-    const type = EQUIP_TYPES[Math.floor(Math.random() * EQUIP_TYPES.length)];
+    // Weighted: armor/helmet/boots slightly higher since they're defense-only
+    const typePool = ['weapon','weapon','weapon','armor','armor','armor','armor','helmet','helmet','helmet','helmet','boots','boots','boots','boots','ring','ring','ring','amulet','amulet','amulet'];
+    const type = typePool[Math.floor(Math.random() * typePool.length)];
     const rand = Math.random();
     let rarity = RARITY_MAP[0];
     for (let i = RARITY_MAP.length - 1; i >= 0; i--) {
